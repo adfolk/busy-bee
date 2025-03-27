@@ -1,8 +1,10 @@
 from enum import Enum
 
 class SrcLangType(Enum):
-    CLANG_HDR = ".h"
-    CLANG_SRC = ".c"
+    # TODO: expand to more languages
+    CLANG = ".c"    # not going to support header.h files for now.
+    CPP = ".cpp"
+    CSHARP = ".cs"
     GOLANG = ".go"
     JAVA = ".java"
     JAVASCRIPT = ".js"
@@ -19,7 +21,7 @@ The Lang class will be used to set and retrieve the appropriate comment strings 
 """
 class Lang:
     def __init__(self, lang_type: SrcLangType) -> None:
-        self.lang_enum = lang_type      # WARNING: get_comment_syntax depends on this member
+        self.lang_enum = lang_type      # WARNING: set_comment_syntax depends on this member
         self.nameof_lang = lang_type
         self.file_ext = lang_type.value
         self.single_ln = None
@@ -31,8 +33,8 @@ class Lang:
 
     def set_comment_syntax(self) -> None:
         match self.lang_enum:
-            # C-like comments
-            case SrcLangType.CLANG_HDR | SrcLangType.CLANG_SRC | SrcLangType.GOLANG | SrcLangType.RUST | SrcLangType.JAVASCRIPT | SrcLangType.TYPESCRIPT | SrcLangType.JAVA:
+            # C-style comments
+            case SrcLangType.CLANG | SrcLangType.CPP |SrcLangType.CSHARP | SrcLangType.GOLANG | SrcLangType.RUST | SrcLangType.JAVASCRIPT | SrcLangType.TYPESCRIPT | SrcLangType.JAVA:
                 self.single_ln = "//"
                 self.multi_ln_op= "/*"
                 self.multi_ln_cl = "*/"
