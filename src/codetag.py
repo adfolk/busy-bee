@@ -1,12 +1,12 @@
 from enum import Enum
 
 class TagType(Enum):
-    TODO = "TODO"
-    FIXME = "FIXME"
-    BUG = "BUG"
-    DEBUG = "DEBUG"
-    HACK = "HACK"
-    NOTE = "NOTE"
+    # TODO: find out how to support keyword aliases
+    TODO = {"TODO:"}
+    FIX = {"FIX:", "FIXME:", "BUG:", "DEBUG:", "ISSUE:"}
+    HACK = {"HACK:", "KLUDGE:"}
+    PERF = {"OPTIMIZE:", "OPTIM:", "PERF:"}
+    TEST = {"TESTING:", "FAILED:"}
 
 
 class CodeTag:
