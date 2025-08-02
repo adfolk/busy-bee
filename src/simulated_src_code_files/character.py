@@ -34,6 +34,7 @@ class Adventurer():
         vigor=4
         # vigor skills
     ):
+        # BUG: this is a bug
         self.hindrances = hindrances
         self.edges = edges
         self.powers = powers
@@ -51,6 +52,12 @@ class Adventurer():
         # hindrances, edges, and powers will be set by passing in lists.
 
         # TODO: write methods to calculate compound attributes.
+
+        # first comment
+        # second comment
+        # FIXME: problem, officer?
+        # fourth comment
+        # fiff
 
 
 

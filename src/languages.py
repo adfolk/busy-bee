@@ -20,12 +20,9 @@ class CommentFamily(Flag):
     MULTI = 2
 
 
-""" 
-The Lang class will be used to set and retrieve the appropriate comment strings for any of the supported languages, which the search_src_file() function will pass to a regex function to create capture groups.
-"""
 class Lang:
     def __init__(self, lang_type: SrcLangType) -> None:
-        self.name_of_lang = lang_type      # WARNING: set_comment_syntax depends on this member
+        self.name_of_lang = lang_type      # WARNING: Lang.set_comment_syntax depends on this member
         self.file_ext = lang_type.value
         self.single_ln = ""
         self.multi_ln_op = None

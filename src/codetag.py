@@ -1,25 +1,29 @@
-from enum import Enum
+class CodeTagInstance():
+    def __init__(self):
+        self._tag_dict = {
+                "FIX": ["FIX", "FIXME", "BUG", "DEBUG", "ISSUE"],
+                "HACK": ["HACK", "KLUDGE"],
+                "PERF": ["OPTIMIZE", "OPTIM", "PERF"],
+                "TEST": ["TESTING", "FAILED"],
+                "TODO": ["TODO"],
+                "WARNING": ["WARNING", "WARN", "CAUTION"]
+        }
+        self.tag_name = ""
+        self.line_number = 0
+        self.message = ""
 
-class TagType(Enum):
-    # TODO: find out how to support keyword aliases
-    TODO = {"TODO:"}
-    FIX = {"FIX:", "FIXME:", "BUG:", "DEBUG:", "ISSUE:"}
-    HACK = {"HACK:", "KLUDGE:"}
-    PERF = {"OPTIMIZE:", "OPTIM:", "PERF:"}
-    TEST = {"TESTING:", "FAILED:"}
+    def find_tag(self, text_string: str, line_num: int) -> bool:
+        separated_text = text_string.split(':', maxsplit=1)
+        if len(separated_text) == 1:    # if no matches are found
+            return False
+        for key, alias_list in self._tag_dict.items():
+            for item in alias_list:
+                if item in separated_text[0]:
+                    self.tag_name = key
+                    self.line_number = line_num
+                    self.message = separated_text[1].strip()
+                    return True
+        return False
+    def __str__(self) -> str:
+        return f"Line: {self.line_number}, Tag: {self.tag_name}, Message: {self.message}"
 
-
-class CodeTag:
-    # TODO: information that this class should be able to carry:
-    """
-        - UID
-        - Abs line number
-        - TODO type
-        - Git commit hash
-        - parent filename
-    """
-    def __init__(self, tag_type: TagType, line_number: int, message: str) -> None:
-        self.tag_type = tag_type
-        self.line_number = line_number
-        self.message = message
-        

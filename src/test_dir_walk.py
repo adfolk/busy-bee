@@ -1,5 +1,5 @@
 import unittest
-from io_ops import find_src_files
+from dir_walk import find_src_files
 
 class TestFileParsing(unittest.TestCase):
     def test_find_src_files(self):

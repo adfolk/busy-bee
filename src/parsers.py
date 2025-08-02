@@ -1,35 +1,36 @@
+from io import TextIOWrapper
 from typing import Generator
-from languages import Lang, CommentFamily
+from languages import Lang
+from codetag import CodeTagInstance
 
-def extract_todo(filename: str, lang: Lang) -> tuple[list, list]:
-    with open(filename) as f:
-        comment_lines = []
-        todos = []
+
+def extract_tagged_comments(file_pathname: str, lang: Lang) -> list:
+    with open(file_pathname) as f:
+        tag_list = []
+        current_tag = CodeTagInstance()
         for num_ln, comment in iterate_comments(f, lang):
-            print(comment)
-            comment_lines.append([num_ln, comment])
-            if "TODO:" in comment:
-                todos.append([num_ln, comment])
+            has_code_tag = current_tag.find_tag(comment, num_ln)
+            if has_code_tag == True:
+                tag_list.append(current_tag)
+                current_tag = CodeTagInstance()
+        return tag_list
 
-        return comment_lines, todos
-
-
-def iterate_comments(file, lang: Lang) -> Generator[tuple[int, str]]:
-    num_ln = 0
-    inMulti = False
+def iterate_comments(file: TextIOWrapper, lang: Lang) -> Generator[tuple[int, str]]:
+    line_number = 0
+    # inMulti = False
     for line in file:
-        num_ln += 1
+        line_number += 1
         line = line.strip()
         if line.startswith(lang.single_ln):
-            yield num_ln, line
-        if lang.comment_type == CommentFamily.MULTI:
-            if line.startswith(lang.multi_ln_op):
-                yield num_ln, line
-                inMulti = True
-            elif inMulti == True:
-                yield num_ln, line
-                if lang.multi_ln_cl in line:
-                    inMulti = False
+            yield line_number, line
+        # if lang.comment_type == CommentFamily.MULTI:
+        #     if line.startswith(lang.multi_ln_op):
+        #         yield line_number, line
+        #         inMulti = True
+        #     elif inMulti == True:
+        #         yield line_number, line
+        #         if lang.multi_ln_cl in line:
+        #             inMulti = False
         else:
             continue
 
