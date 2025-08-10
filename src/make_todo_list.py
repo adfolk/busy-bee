@@ -4,8 +4,6 @@ from os import getcwd
 
 # Logic for generating the presentation layer (basically just a md file)
 
-# maybe a string representing the markdown elements?
-
 def set_working_dir_name():
     this_dir = Path(getcwd())
     return f"# {this_dir.name}"
