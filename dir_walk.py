@@ -7,7 +7,8 @@ def get_tagged_comments(abs_pathname: str) -> dict:
     src_files = find_src_files(abs_pathname)
     for file_pathname, lang in src_files:
         tagged_comments = extract_tagged_comments(file_pathname, lang)
-        comment_dict[file_pathname] = tagged_comments
+        if tagged_comments != None:
+            comment_dict[file_pathname] = tagged_comments
     return comment_dict
 
 def find_src_files(abs_pathname: str) -> list[tuple]:
@@ -15,6 +16,8 @@ def find_src_files(abs_pathname: str) -> list[tuple]:
 
     src_files = []
     for root, dirs, files, rootfd in os.fwalk(abs_pathname):
+        if '.venv' in dirs:
+            dirs.remove('.venv') # don't get todos from venv dependencies in Python projects
         for name in files:
             src_lang_type = infer_lang_type(name)
             if src_lang_type is not None:

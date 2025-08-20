@@ -1,14 +1,9 @@
 from codetag import CodeTagInstance
-from pathlib import Path
-from os import getcwd
 
 # Logic for generating the presentation layer (basically just a md file)
 
-def set_working_dir_name():
-    this_dir = Path(getcwd())
-    return f"# {this_dir.name}"
-
-def unpack_tag_lists(tag_dict: dict):
+def compose_tag_doc(tag_dict: dict) -> str:
+    """Iterate through all tags found in a given root directory by get_tagged_comments() and put them into a md string."""
     giant_list_str = ""
     for key, value in tag_dict:
         todos = organize_by_tag_type(value)
@@ -17,7 +12,7 @@ def unpack_tag_lists(tag_dict: dict):
 
     return giant_list_str
 
-def organize_by_tag_type(tags: list[CodeTagInstance]):
+def organize_by_tag_type(tags: list[CodeTagInstance]) -> str:
     todos = ""
     fixmes = ""
     perfs = ""

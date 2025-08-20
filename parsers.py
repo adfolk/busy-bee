@@ -4,7 +4,7 @@ from languages import Lang
 from codetag import CodeTagInstance
 
 
-def extract_tagged_comments(file_pathname: str, lang: Lang) -> list:
+def extract_tagged_comments(file_pathname: str, lang: Lang) -> list | None:
     with open(file_pathname) as f:
         tag_list = []
         current_tag = CodeTagInstance()
@@ -13,7 +13,9 @@ def extract_tagged_comments(file_pathname: str, lang: Lang) -> list:
             if has_code_tag == True:
                 tag_list.append(current_tag)
                 current_tag = CodeTagInstance()
-        return tag_list
+        if tag_list != []:
+            return tag_list
+        return None
 
 def iterate_comments(file: TextIOWrapper, lang: Lang) -> Generator[tuple[int, str]]:
     line_number = 0
