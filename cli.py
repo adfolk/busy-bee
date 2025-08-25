@@ -11,7 +11,7 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Task_Table(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    todos_only: Annotated[bool, typer.Option(help="Include only TODO tags in the table")] = False,
+    all_tags: Annotated[bool, typer.Option(help="Include all types of code tags in the table")] = False,
                ):
     # TODO: test sort and filter methods
     # TODO: define option flags
@@ -36,8 +36,9 @@ def Task_Table(
             tag_table.add_tag(new_row)
 
     # handle flags
+    tag_table.filename_sort()
     processed_tags = tag_table.tags
-    if todos_only:
+    if not all_tags:
         processed_tags = tag_table.tag_name_filter("TODO")
 
     for row in processed_tags:
@@ -79,22 +80,6 @@ class TagTable:
             if tag.tag_name == tag_type:
                 filtered.append(tag)
         return filtered
-
-
-def todos_only_filter(tag_list: list[CodeTagInstance]) -> list[CodeTagInstance] | list:
-    """Use for default display. Passing the --all-tags flag should suppress calling this function"""
-    filtered_list = []
-    for tag in tag_list:
-        if tag.tag_name == "TODO":
-            filtered_list.append(tag)
-
-    return filtered_list
-
-# def alpha_order_proj_names(project_dict: dict[str, list[CodeTagInstance]]) -> list[str]:
-#     path_names = []
-#     for key in project_dict:
-#         path_names.append(key)
-#     return path_names.sort()
 
 
 if __name__ == "__main__":
