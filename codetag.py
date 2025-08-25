@@ -1,3 +1,7 @@
+from functools import total_ordering
+
+
+@total_ordering
 class CodeTagInstance():
     def __init__(self):
         self._tag_dict = {
@@ -24,6 +28,13 @@ class CodeTagInstance():
                     self.message = separated_text[1].strip()
                     return True
         return False
+
     def __str__(self) -> str:
         return f"Line: {self.line_number}, Tag: {self.tag_name}, Message: {self.message}"
+
+    def __eq__(self, other):
+        return (self.line_number == other.line_number)
+
+    def __lt__(self, other):
+        return self.line_number < other.line_number
 

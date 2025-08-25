@@ -4,7 +4,7 @@ from languages import Lang
 from codetag import CodeTagInstance
 
 
-def extract_tagged_comments(file_pathname: str, lang: Lang) -> list | None:
+def extract_tagged_comments(file_pathname: str, lang: Lang) -> list[CodeTagInstance] | None:
     with open(file_pathname) as f:
         tag_list = []
         current_tag = CodeTagInstance()

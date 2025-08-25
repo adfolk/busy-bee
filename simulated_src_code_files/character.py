@@ -6,6 +6,8 @@ class Adventurer():
         Even more wordy words.
         words galore.
     """
+
+    # WARN: don't change this, it'll break other stuff
     def __init__(
         self,
         hindrances=None,
@@ -33,6 +35,8 @@ class Adventurer():
 
         vigor=4
         # vigor skills
+
+        # HACK: some brittle code
     ):
         # BUG: this is a bug
         self.hindrances = hindrances
@@ -50,6 +54,7 @@ class Adventurer():
         self.stealth = stealth
 
         # hindrances, edges, and powers will be set by passing in lists.
+        # PERF: make this better
 
         # TODO: write methods to calculate compound attributes.
 

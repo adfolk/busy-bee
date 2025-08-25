@@ -1,8 +1,9 @@
 import os
+from codetag import CodeTagInstance
 from languages import SrcLangType, Lang
 from parsers import extract_tagged_comments
 
-def get_tagged_comments(abs_pathname: str) -> dict:
+def get_tagged_comments(abs_pathname: str) -> dict[str, list[CodeTagInstance]]:
     comment_dict = {}
     src_files = find_src_files(abs_pathname)
     for file_pathname, lang in src_files:
@@ -11,11 +12,11 @@ def get_tagged_comments(abs_pathname: str) -> dict:
             comment_dict[file_pathname] = tagged_comments
     return comment_dict
 
-def find_src_files(abs_pathname: str) -> list[tuple]:
+def find_src_files(abs_pathname: str) -> list[tuple[str, Lang]]:
     # Return a list of all source code files in a parent directory as indicated by their file extensions
 
     src_files = []
-    for root, dirs, files, rootfd in os.fwalk(abs_pathname):
+    for root, dirs, files in os.walk(abs_pathname):
         if '.venv' in dirs:
             dirs.remove('.venv') # don't get todos from venv dependencies in Python projects
         for name in files:
