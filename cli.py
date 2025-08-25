@@ -11,12 +11,11 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Task_Table(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    filtered: Annotated[bool, typer.Option(help="select which tag to show")] = False,
+    todos_only: Annotated[bool, typer.Option(help="Include only TODO tags in the table")] = False,
                ):
     # TODO: test sort and filter methods
     # TODO: define option flags
     # TODO: each table row different color based on module name
-    # TODO: integrate with other project management tools, note apps, etc
     # TODO: write docstring
     name_of_project = os.path.basename(project_path)
     todo_result = get_tagged_comments(project_path)
@@ -37,10 +36,11 @@ def Task_Table(
             tag_table.add_tag(new_row)
 
     # handle flags
-    if filtered:
-        tag_table = tag_table.tag_name_filter()
+    processed_tags = tag_table.tags
+    if todos_only:
+        processed_tags = tag_table.tag_name_filter("TODO")
 
-    for row in tag_table.tags:
+    for row in processed_tags:
         table.add_row(
             row.file_name,
             row.line_num,
@@ -67,11 +67,11 @@ class TagTable:
     def add_tag(self, tag: TagRow):
         self.tags.append(tag)
 
-    def filename_sort(self) -> list[TagRow]:
-        return sorted(self.tags, key=lambda tag: tag.file_name)
+    def filename_sort(self):
+        self.tags = sorted(self.tags, key=lambda tag: tag.file_name)
 
-    def tag_name_sort(self) -> list[TagRow]:
-        return sorted(self.tags, key=lambda tag: tag.tag_name)
+    def tag_name_sort(self):
+        self.tags = sorted(self.tags, key=lambda tag: tag.tag_name)
 
     def tag_name_filter(self, tag_type: str) -> list[TagRow] | list:
         filtered = []
