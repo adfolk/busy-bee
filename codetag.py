@@ -1,16 +1,22 @@
 from functools import total_ordering
 
+FIX = "FIX"
+HACK = "HACK"
+PERF = "PERF"
+TEST = "TEST"
+TODO = "TODO"
+WARNING = "WARNING"
 
 @total_ordering
 class CodeTagInstance():
     def __init__(self):
         self._tag_dict = {
-                "FIX": ["FIX", "FIXME", "BUG", "DEBUG", "ISSUE"],
-                "HACK": ["HACK", "KLUDGE"],
-                "PERF": ["OPTIMIZE", "OPTIM", "PERF"],
-                "TEST": ["TESTING", "FAILED"],
-                "TODO": ["TODO"],
-                "WARNING": ["WARNING", "WARN", "CAUTION"]
+                FIX: ["FIX", "FIXME", "BUG", "DEBUG", "ISSUE"],
+                HACK: ["HACK", "KLUDGE"],
+                PERF: ["OPTIMIZE", "OPTIM", "PERF"],
+                TEST: ["TESTING", "FAILED"],
+                TODO: ["TODO"],
+                WARNING: ["WARNING", "WARN", "CAUTION"]
         }
         self.tag_name = ""
         self.line_number = 0

@@ -1,7 +1,7 @@
 import os
 import typer
 from typing_extensions import Annotated
-from codetag import CodeTagInstance
+from codetag import FIX, HACK, PERF, WARNING, CodeTagInstance
 from dir_walk import get_tagged_comments
 from rich.table import Table
 from rich.console import Console
@@ -11,7 +11,7 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Task_Table(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    all_tags: Annotated[bool, typer.Option(help="Include all types of code tags in the table")] = False,
+    all_tag_types: Annotated[bool, typer.Option(help="Include all types of code tags in the table")] = False,
                ):
     # TODO: test sort and filter methods
     # TODO: define option flags
@@ -21,6 +21,7 @@ def Task_Table(
     todo_result = get_tagged_comments(project_path)
 
     table = Table(title=name_of_project, show_lines=True)
+    table.add_column("#", style="white")
     table.add_column("Filename", style="green1")
     table.add_column("Line Num", style="cyan1")
     table.add_column("Tag Type", style="magenta1")
@@ -37,22 +38,27 @@ def Task_Table(
 
     # handle flags
     tag_table.filename_sort()
-    processed_tags = tag_table.tags
-    if not all_tags:
-        processed_tags = tag_table.tag_name_filter("TODO")
+    if not all_tag_types:
+        tag_table.filter_out_tag_types(
+            FIX,
+            PERF,
+            HACK,
+            WARNING
+        )
 
-    for row in processed_tags:
+    for row in tag_table.view:
+        i = 0
         table.add_row(
+            str(i),
             row.file_name,
             row.line_num,
             row.tag_name,
             row.message
         )
+        i += 1
 
     console = Console()
     console.print(table)
-
-# Helper functions for app commands
 
 class TagRow:
     def __init__(self, file_name: str, tag: CodeTagInstance):
@@ -63,24 +69,37 @@ class TagRow:
 
 class TagTable:
     def __init__(self, tag_list: list[TagRow]=[]):
-        self.tags = tag_list
+        self._tags = tag_list
+        self.view = tag_list
 
     def add_tag(self, tag: TagRow):
-        self.tags.append(tag)
+        self._tags.append(tag)
 
     def filename_sort(self):
-        self.tags = sorted(self.tags, key=lambda tag: tag.file_name)
+        self.view = sorted(self.view, key=lambda tag: tag.file_name)
 
     def tag_name_sort(self):
-        self.tags = sorted(self.tags, key=lambda tag: tag.tag_name)
+        self.view = sorted(self.view, key=lambda tag: tag.tag_name)
 
-    def tag_name_filter(self, tag_type: str) -> list[TagRow] | list:
-        filtered = []
-        for tag in self.tags:
-            if tag.tag_name == tag_type:
-                filtered.append(tag)
-        return filtered
+    def filter_out_tag_types(self, *tag_type: str):
+        for tag in self.view:
+            for name in tag_type:
+                if tag.tag_name == name:
+                    self.view.remove(tag)
 
+    def hide_entries(self, *row_nums: int):
+        chopping_block = []
+        for i in row_nums:
+            try:
+                chopping_block.append(self.view[i])
+            except IndexError:
+                print(f"Error: row number {i} does not exist")
+
+        for tag in chopping_block:
+            self.view.remove(tag)
+
+    def reset_view(self):
+        self.view = self._tags
 
 if __name__ == "__main__":
     app()
