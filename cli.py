@@ -40,11 +40,9 @@ def Task_Table(
     # tag_table.reset_view()
     # tag_table.filename_sort()
     if not all_tag_types:
-        print("filtering out non-todo tags")
         tag_table.filter_out_tag_types(FIX, PERF, HACK, WARNING)
 
     i = 0
-    print(len(tag_table.view))
     for row in tag_table.view:
         table.add_row(
             str(i),
@@ -80,13 +78,17 @@ class TagTable:
         self.view = sorted(self.view, key=lambda tag: tag.tag_name)
 
     def filter_out_tag_types(self, *tag_type: str):
+        filtered = []
+        black_list = []
+
+        for name in tag_type:
+            black_list.append(name)
+
         for tag in self.view:
-            print(tag.message)
-            for name in tag_type:
-                print(name)
-                if tag.tag_name == name:
-                    print(tag.tag_name)
-                    self.view.remove(tag)
+            if tag.tag_name not in black_list:
+                filtered.append(tag)
+
+        self.view = filtered
 
     def hide_entries(self, *row_nums: int):
         chopping_block = []
