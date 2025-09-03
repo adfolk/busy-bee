@@ -11,8 +11,10 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Task_Table(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    all_tag_types: Annotated[bool, typer.Option(help="Include all types of code tags in the table")] = False,
-               ):
+    all_tag_types: Annotated[bool, typer.Option(
+        "--all",
+        help="Include all types of code tags in the table")] = False,
+    ):
     # TODO: test sort and filter methods
     # TODO: define option flags
     # TODO: each table row different color based on module name
@@ -79,10 +81,7 @@ class TagTable:
 
     def filter_out_tag_types(self, *tag_type: str):
         filtered = []
-        black_list = []
-
-        for name in tag_type:
-            black_list.append(name)
+        black_list = {*tag_type}
 
         for tag in self.view:
             if tag.tag_name not in black_list:
