@@ -1,7 +1,7 @@
 import os
 import typer
-from typing_extensions import Annotated
-from codetag import FIX, HACK, PERF, WARNING, CodeTagInstance
+from typing_extensions import Annotated, Optional
+from codetag import FIX, HACK, PERF, TODO, WARNING, CodeTagInstance
 from dir_walk import get_tagged_comments
 from rich.table import Table
 from rich.console import Console
@@ -11,14 +11,10 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Task_Table(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    all_tag_types: Annotated[bool, typer.Option(
-        "--all",
-        help="Include all types of code tags in the table")] = False,
+    select_tag_types: Annotated[Optional[str], typer.Option(
+        "--select-tags", "-s",
+        help="Choose which tag types to show: [t]odo, [f]ix, [h]ack, [p]erf, [w]arning")] = None,
     ):
-    # TODO: test sort and filter methods
-    # TODO: define option flags
-    # TODO: each table row different color based on module name
-    # TODO: write docstring
     name_of_project = os.path.basename(project_path)
     todo_result = get_tagged_comments(project_path)
 
@@ -38,11 +34,11 @@ def Task_Table(
             new_row = TagRow(file_name, todo_item)
             tag_table.add_tag(new_row)
 
-    # handle flags
-    # tag_table.reset_view()
-    # tag_table.filename_sort()
-    if not all_tag_types:
-        tag_table.filter_out_tag_types(FIX, PERF, HACK, WARNING)
+    match select_tag_types:
+        case None:
+            tag_table.filter_for_tag_type(TODO, FIX, PERF, HACK, WARNING)
+        case _:
+            tag_table.filter_for_tag_type(*filter_arguments(select_tag_types))
 
     i = 0
     for row in tag_table.view:
@@ -57,6 +53,26 @@ def Task_Table(
 
     console = Console()
     console.print(table)
+
+def filter_arguments(tags: str) -> tuple[str]:
+    user_list = list(tags)
+    command_list = []
+    for item in user_list:
+        match item:
+            case "t":
+                command_list.append(TODO)
+            case "f":
+                command_list.append(FIX)
+            case "p":
+                command_list.append(PERF)
+            case "w":
+                command_list.append(WARNING)
+            case "h":
+                command_list.append(HACK)
+            case _:
+                raise ValueError(f"{item} is not an accepted argument")
+
+    return tuple(command_list)
 
 class TagRow:
     def __init__(self, file_name: str, tag: CodeTagInstance):
@@ -79,12 +95,12 @@ class TagTable:
     def tag_name_sort(self):
         self.view = sorted(self.view, key=lambda tag: tag.tag_name)
 
-    def filter_out_tag_types(self, *tag_type: str):
+    def filter_for_tag_type(self, *tag_type: str):
         filtered = []
-        black_list = {*tag_type}
+        selected = {*tag_type}
 
         for tag in self.view:
-            if tag.tag_name not in black_list:
+            if tag.tag_name in selected:
                 filtered.append(tag)
 
         self.view = filtered
