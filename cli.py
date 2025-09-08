@@ -1,4 +1,5 @@
 import os
+# import sqlite3
 import typer
 from tag_table import TagTable, TagRow
 from typing_extensions import Annotated, Optional
@@ -9,6 +10,10 @@ from rich.console import Console
 
 app = typer.Typer(no_args_is_help=True)
 global_tag_table = TagTable()
+global_project = ""
+
+# con = sqlite3.connect("tag_store.db")
+# cur = con.cursor()
 
 @app.command()
 def Get_Tasks(
@@ -22,8 +27,31 @@ def Get_Tasks(
     if select_tag_types is not None:
         global_tag_table.filter_for_tag_type(*filter_arguments(select_tag_types))
 
-    name_of_project = os.path.basename(project_path)
-    table = make_display_table(name_of_project)
+    global_project = os.path.basename(project_path)
+    table = make_display_table(global_project)
+    console = Console()
+    console.print(table)
+
+@app.command()
+def Hide_Entries(
+    tag_ids: Annotated[list[str], typer.Argument()]
+    ):
+    """
+    Pass in a string of numbers delimited by whitespace.
+
+    Example: 1 3 8 10
+    """
+    args = tuple(map(int, tag_ids))
+    global_tag_table.hide_entries(*args)
+
+    table = make_display_table(global_project)
+    console = Console()
+    console.print(table)
+
+@app.command()
+def Reset_View():
+    global_tag_table.reset_view()
+    table = make_display_table(global_project)
     console = Console()
     console.print(table)
 
@@ -48,16 +76,14 @@ def make_display_table(name: str) -> Table:
     table.add_column("Tag Type", style="magenta1")
     table.add_column("Message", style="slate_blue1")
 
-    i = 0
     for row in global_tag_table.view:
         table.add_row(
-            str(i),
+            row.row_id,
             row.file_name,
             row.line_num,
             row.tag_name,
             row.message
         )
-        i += 1
 
     return table
 
