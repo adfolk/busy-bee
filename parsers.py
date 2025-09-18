@@ -19,20 +19,9 @@ def extract_tagged_comments(file_pathname: str, lang: Lang) -> list[CodeTagInsta
 
 def iterate_comments(file: TextIOWrapper, lang: Lang) -> Generator[tuple[int, str]]:
     line_number = 0
-    # inMulti = False
     for line in file:
         line_number += 1
         line = line.strip()
         if line.startswith(lang.single_ln):
             yield line_number, line
-        # if lang.comment_type == CommentFamily.MULTI:
-        #     if line.startswith(lang.multi_ln_op):
-        #         yield line_number, line
-        #         inMulti = True
-        #     elif inMulti == True:
-        #         yield line_number, line
-        #         if lang.multi_ln_cl in line:
-        #             inMulti = False
-        else:
-            continue
 

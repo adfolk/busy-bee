@@ -1,5 +1,4 @@
 import os
-# import sqlite3
 import typer
 from tag_table import TagTable, TagRow
 from typing_extensions import Annotated, Optional
@@ -12,8 +11,6 @@ app = typer.Typer(no_args_is_help=True)
 global_tag_table = TagTable()
 global_project = ""
 
-# con = sqlite3.connect("tag_store.db")
-# cur = con.cursor()
 
 @app.command()
 def Get_Tasks(
