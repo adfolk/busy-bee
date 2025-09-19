@@ -52,14 +52,15 @@ class CodeFile:
 
 class Project:
     def __init__(self, project_path: str) -> None:
-        # TODO: old arch is designed to look at files on the os and doesn't care about what's in version control.
-        # The new design should first look at the commit pointed to by HEAD, capture those tags, and then look at untracked changes.
-        # If any comments in untracked or uncommitted blobs are not exact match to commits, log them as new tags in a separate db table.
-        # Show new tags with warning of uncommitted changes.
+        # NOTE: old arch is designed to look at files on the os and doesn't care about what's in version control.
+
+        # TODO: capture only most recent commit. Pseudocode below:
+            # If user attempts cmd with staged or untracked changes, show warning.
+            # Once user commits and working tree is clean, process the files for tags.
+
         self.project_path: str = project_path
         self.repo: git.Repo = git.Repo(project_path)
         assert not self.repo.bare, f"No git repository initialized at path {project_path}"
-        self.current_head = self.repo.head
-        # TODO: need to figure out how git.Repo tracks state of current repo
+        self.tree: git.Tree = self.repo.head.commit.tree
         self.code_files: list[CodeFile] = []
 
