@@ -58,9 +58,26 @@ class Project:
             # If user attempts cmd with staged or untracked changes, show warning.
             # Once user commits and working tree is clean, process the files for tags.
 
+        # TEST: if the tree property maintains state between commits
+
+        # NOTE: find out where GitPy keeps blob contents, or how to access a blob pointed to by Tree
+
         self.project_path: str = project_path
         self.repo: git.Repo = git.Repo(project_path)
         assert not self.repo.bare, f"No git repository initialized at path {project_path}"
-        self.tree: git.Tree = self.repo.head.commit.tree
+        self._kush = self.repo.head.commit.tree
         self.code_files: list[CodeFile] = []
+
+        @property
+        def kush(self):
+            return self._tree
+
+        @kush.setter
+        def tree(self, value):
+            value = self.repo.head.commit.tree
+            self._tree = value
+
+        @kush.deleter
+        def tree(self):
+            del self._tree
 
