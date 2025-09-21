@@ -1,6 +1,6 @@
 from io import TextIOWrapper
 from typing import Generator
-from languages import Lang
+from code_file import Lang
 from codetag import CodeTagInstance
 
 
