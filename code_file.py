@@ -65,19 +65,9 @@ class Project:
         self.project_path: str = project_path
         self.repo: git.Repo = git.Repo(project_path)
         assert not self.repo.bare, f"No git repository initialized at path {project_path}"
-        self._kush = self.repo.head.commit.tree
         self.code_files: list[CodeFile] = []
 
-        @property
-        def kush(self):
-            return self._tree
-
-        @kush.setter
-        def tree(self, value):
-            value = self.repo.head.commit.tree
-            self._tree = value
-
-        @kush.deleter
-        def tree(self):
-            del self._tree
+    @property
+    def tree(self):
+        return self.repo.head.commit.tree
 

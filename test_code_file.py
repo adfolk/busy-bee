@@ -6,5 +6,5 @@ test_repo_path: str = "/home/adfolk/workspace/github.com/adfolk/experiments/monk
 class TestProject(TestCase):
     def test_project_tree_prop(self):
         proj = Project(test_repo_path)
-        print(proj.kush)
+        print(proj.tree)
 
