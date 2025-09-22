@@ -1,7 +1,7 @@
 from enum import Enum
 import git
 from io import TextIOWrapper
-from codetag import CodeTagInstance
+from code_tag import CodeTag, TagInstance
 from typing import Generator
 
 class SrcLangType(Enum):
@@ -22,31 +22,31 @@ class SrcLangType(Enum):
 
 class Lang:
     def __init__(self, lang_type: SrcLangType) -> None:
-        self.name_of_lang = lang_type
-        self.file_ext = lang_type.value
-        self.single_ln = ""
+        self.name_of_lang: SrcLangType = lang_type
+        self.file_ext: str = lang_type.value
+        self.comment_symbol: str = self._get_comment_syntax()
 
-        self.set_comment_syntax()
-
-    def set_comment_syntax(self) -> None:
+    def _get_comment_syntax(self) -> str:
         match self.name_of_lang:
             case SrcLangType.CLANG | SrcLangType.CPP |SrcLangType.CSHARP | SrcLangType.GOLANG | SrcLangType.RUST | SrcLangType.JAVASCRIPT | SrcLangType.TYPESCRIPT | SrcLangType.JAVA | SrcLangType.PHP | SrcLangType.ZIG:
-                self.single_ln = "//"
+                return "//"
 
             case SrcLangType.LUA:
-                self.single_ln = "--"
+                return "--"
 
             case SrcLangType.PYTHON:
-                self.single_ln = "#"
+                return "#"
 
     def __repr__(self) -> str:
         return f"{self.name_of_lang.name}"
 
 class CodeFile:
-    def __init__(self, file_path: str, lang_type: SrcLangType) -> None:
+    def __init__(self, file_path: str, lang_type: SrcLangType, commit_hash: int, blob_hash: int) -> None:
         self._file_path = file_path
         self._lang = Lang(lang_type)
-        self._commit = None
+        self._commit = commit_hash
+        self._blob_id = blob_hash
+        self._tags = self._extract_tagged_comments()
 
     @property
     def path(self):
@@ -57,22 +57,27 @@ class CodeFile:
     @property
     def commit(self):
         return self._commit
+    @property
+    def blob(self):
+        return self._blob_id
 
-    def extract_tagged_comments(self) -> list[CodeTagInstance]:
+    def _extract_tagged_comments(self) -> list[TagInstance]:
         with open(self.path) as f:
             tag_list = []
-            current_tag = CodeTagInstance()
             for num_ln, comment in iterate_comments(f, self.lang):
-                has_code_tag = current_tag.find_tag(comment, num_ln)
-                if has_code_tag == True:
-                    tag_list.append(current_tag)
-                    current_tag = CodeTagInstance()
+                separated_text = comment.split(':', maxsplit=1)
+                if len(separated_text) > 1:
+                    tag_type = CodeTag.which_tag(separated_text[0])
+                    if tag_type != None:
+                        tag_list.append(TagInstance(tag_type, num_ln, separated_text[1]))
             return tag_list
+
+    @property
+    def tags(self):
+        return self._tags
 
 class Project:
     def __init__(self, project_path: str) -> None:
-        # NOTE: old arch is designed to look at files on the os and doesn't care about what's in version control.
-
         # TODO: capture only most recent commit. Pseudocode below:
             # If user attempts cmd with staged or untracked changes, show warning.
             # Once user commits and working tree is clean, process the files for tags.
@@ -106,9 +111,11 @@ class Project:
             if entry.type == "tree":
                 blobs.extend(self._get_files(entry))
             file_type = infer_lang_type(entry.name)
-            if file_type is not None:
+            if file_type != None:
                 path_to_file = f"{self.path}{entry.path}"
-                blobs.append(CodeFile(path_to_file, file_type))
+                commit_hash = entry.commit_id
+                blob_hash = entry.blob_id
+                blobs.append(CodeFile(path_to_file, file_type, commit_hash, blob_hash))
         return blobs
 
     @property
@@ -127,6 +134,6 @@ def iterate_comments(file: TextIOWrapper, lang: Lang) -> Generator[tuple[int, st
     for line in file:
         line_number += 1
         line = line.strip()
-        if line.startswith(lang.single_ln):
+        if line.startswith(lang.comment_symbol):
             yield line_number, line
 
