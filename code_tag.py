@@ -1,7 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 
-class CodeTag(Enum):
+class CodeTagEnum(Enum):
     BUG = {"FIX", "FIXME", "BUG", "DEBUG", "ISSUE"}
     HACK = {"HACK", "KLUDGE"}
     PERF = {"OPTIMIZE", "OPTIM", "PERF"}
@@ -16,8 +16,8 @@ class CodeTag(Enum):
                 return cls(member)
     
 @dataclass
-class TagInstance:
-    _tag_enum: CodeTag
+class CodeTag:
+    _tag_enum: CodeTagEnum
     line_number: int
     message: str
     parent_file_name: str
