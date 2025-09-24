@@ -64,7 +64,8 @@ class Project:
 
     def _get_tagged_files(self):
         for src_file in self.src_files:
-            if src_file.tags != []:
+            tags = src_file.tags
+            if tags != []:
                 self._tagged_src_files.append(src_file)
 
     def _get_files(self, root: Tree) -> list[CodeFile]:
@@ -80,7 +81,7 @@ class Project:
             lang_type = SrcLang.get_lang(file_name)
             if lang_type != None:
                 path_to_file = f"{self.path}{entry.path}"
-                commit_hash = self.commit.name_rev
+                commit_hash = self.commit.hexsha
                 blob_hash = entry.hexsha
                 code_file = CodeFile(file_name, path_to_file, lang_type, commit_hash, blob_hash)
                 blobs.append(code_file)

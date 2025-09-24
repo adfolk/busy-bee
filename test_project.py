@@ -13,6 +13,8 @@ test_repo_path: str = "/Users/austinfolkestad/workspace/github.com/adfolk/experi
 class TestProject(unittest.TestCase):
     def test_project_integration(self):
         proj = Project(test_repo_path)
-        for file in proj.src_files:
-            print(file.file_name)
+        tagged_files = proj.tagged_src_files
+        for file in tagged_files:
+            for tag in file.tags:
+                print(tag.message)
 

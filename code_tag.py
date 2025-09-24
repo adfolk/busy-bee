@@ -14,6 +14,7 @@ class CodeTagEnum(Enum):
         for name, member in cls.__members__.items():
             if word in member.value:
                 return cls(member)
+        return None
     
 @dataclass
 class CodeTag:
@@ -21,8 +22,8 @@ class CodeTag:
     line_number: int
     message: str
     parent_file_name: str
-    commit_parent: int
-    blob_parent: int
+    commit_parent: str
+    blob_parent: str
 
     @property
     def tag_name(self):

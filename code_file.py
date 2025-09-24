@@ -37,8 +37,9 @@ class CodeFile:
             tag_list = []
             for num_ln, comment in self._iterate_comments(f, self.lang):
                 separated_text = comment.split(':', maxsplit=1)
-                if len(separated_text) > 1:
-                    tag_type = CodeTagEnum.which_tag(separated_text[0])
+                if len(separated_text) > 0:
+                    first_token = separated_text[0].strip(self.lang.comment_symbol).strip()
+                    tag_type = CodeTagEnum.which_tag(first_token)
                     tag_text = separated_text[1]
                     if tag_type != None:
                         tag_list.append(CodeTag(tag_type, num_ln, tag_text, self.file_name, self.commit, self.blob))

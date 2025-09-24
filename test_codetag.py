@@ -1,5 +1,5 @@
 import unittest
-from codetag import CodeTag
+from code_tag import CodeTagEnum
 
 todo_line = "# TODO: write test for this"
 fix_alt_BUG = "# BUG: this is broken"
@@ -9,6 +9,10 @@ warn_line = "# WARNING: this hard-coded global var is depended on by the entire 
 class TestTagType(unittest.TestCase):
     def test_codetag_matching(self):
         text = "BUG"
-        tag = CodeTag.which_tag(text)
-        self.assertEqual(tag, CodeTag.BUG)
+        tag = CodeTagEnum.which_tag(text)
+        self.assertEqual(tag, CodeTagEnum.BUG)
+
+        other_text = "TODO"
+        other_tag = CodeTagEnum.which_tag(other_text)
+        self.assertEqual(other_tag, CodeTagEnum.TODO)
 
