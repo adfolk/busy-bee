@@ -3,17 +3,14 @@ from io import TextIOWrapper
 from src_lang import SrcLang
 from typing import Generator
 
-class NoTagsException(Exception):
-    """No code tags found."""
-
 class CodeFile:
-    def __init__(self, file_name: str, file_path: str, lang_type: SrcLang, commit_hash: int, blob_hash: int) -> None:
+    def __init__(self, file_name: str, file_path: str, lang_type: SrcLang, commit_hash: str, blob_hash: str) -> None:
         self._file_name = file_name
         self._file_path = file_path
         self._lang = lang_type
         self._commit = commit_hash
         self._blob_id = blob_hash
-        self._tags: list[CodeTag] | type[NoTagsException] = self._extract_tagged_comments()
+        self._tags: list[CodeTag] = self._extract_tagged_comments()
 
     @property
     def path(self):
@@ -34,10 +31,8 @@ class CodeFile:
     def tags(self):
         return self._tags
 
-    # API methods
-
     # Private implementation and helper methods
-    def _extract_tagged_comments(self) -> list[CodeTag] | type[NoTagsException]:
+    def _extract_tagged_comments(self) -> list[CodeTag]:
         with open(self.path) as f:
             tag_list = []
             for num_ln, comment in self._iterate_comments(f, self.lang):
@@ -47,8 +42,6 @@ class CodeFile:
                     tag_text = separated_text[1]
                     if tag_type != None:
                         tag_list.append(CodeTag(tag_type, num_ln, tag_text, self.file_name, self.commit, self.blob))
-            if tag_list == []:
-                return NoTagsException
             return tag_list
 
     @staticmethod

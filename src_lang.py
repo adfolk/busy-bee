@@ -42,7 +42,7 @@ class SrcLang:
 
     @staticmethod
     def get_lang(file_name: str):
-        lang_type = SrcLangType(file_name)
+        lang_type = SrcLangType.infer_lang_type(file_name)
         if lang_type != None:
             return SrcLang(lang_type)
         return None
