@@ -18,3 +18,7 @@ class TestProject(unittest.TestCase):
             for tag in file.tags:
                 print(tag.message)
 
+    def test_name(self):
+        proj = Project(test_repo_path)
+        proj_name = proj.name
+        self.assertEqual(proj_name, "git-monkey")

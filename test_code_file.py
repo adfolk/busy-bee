@@ -1,4 +1,4 @@
-from code_file import Project
+from code_file import CodeFile
 from unittest import TestCase
 
 python_file = '/Users/austinfolkestad/workspace/github.com/adfolk/personal-projects/busy-bee/src/simulated_src_code_files/character.py'

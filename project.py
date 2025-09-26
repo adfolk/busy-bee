@@ -1,3 +1,4 @@
+import os.path
 from git import Repo, Tree
 from code_file import CodeFile
 from src_lang import SrcLang
@@ -61,6 +62,12 @@ class Project:
     @property
     def commit(self):
         return self.repo.head.commit
+    @property
+    def name(self):
+        normed_path = os.path.normpath(self._path)
+        tail = normed_path.rpartition('/')[-1]
+        return tail
+
 
     def _get_tagged_files(self):
         for src_file in self.src_files:
