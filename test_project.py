@@ -22,3 +22,7 @@ class TestProject(unittest.TestCase):
         proj = Project(test_repo_path)
         proj_name = proj.name
         self.assertEqual(proj_name, "git-monkey")
+
+    def test_commit_id_length(self):
+        proj = Project(test_repo_path)
+        self.assertEqual(len(proj.commit_id), 40)

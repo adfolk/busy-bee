@@ -1,8 +1,5 @@
-from project import Project as Prj
-from code_file import CodeFile
-from code_tag import CodeTag
 from database import create_app_db
-from peewee import Model, ForeignKeyField
+from peewee import CharField, IntegerField, Model, ForeignKeyField, TextField
 
 db = create_app_db()
 
@@ -11,7 +8,19 @@ class BaseModel(Model):
         database = db
 
 class Project(BaseModel):
-    def __init__(self, proj: Prj) -> None:
-        self.commit_id = ForeignKeyField(proj.commit)
-        self.name = proj.name
+    commit_id = CharField(max_length=40)
+    name = TextField()
+    path = TextField()
+
+class SourceCodeFile(BaseModel):
+    commit_id = ForeignKeyField(Project, backref='commit_id')
+    blob_id = CharField(max_length=40)
+    name = TextField()
+
+class CodeTag(BaseModel):
+    commit_id = ForeignKeyField(Project, backref='commit_id')
+    parent_blob_id = ForeignKeyField(SourceCodeFile, backref='blob_id')
+    tag_name = TextField()
+    message = TextField()
+    line_num = IntegerField()
 

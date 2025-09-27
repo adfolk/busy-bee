@@ -30,7 +30,7 @@ class Project:
         self._tagged_src_files: list[CodeFile] = []
 
     @property
-    def src_files(self):
+    def src_files(self) -> list[CodeFile]:
         """
         Looks for source code files in the most recent commit found in project's git.
         If any are found, they are returned as CodeFile objects. If not, an exception is raised.
@@ -41,7 +41,7 @@ class Project:
         return self._src_files
 
     @property
-    def tagged_src_files(self):
+    def tagged_src_files(self) -> list[CodeFile]:
         """
         Gets only those source code files that have tags. If none of them do, raises an exception.
         """
@@ -51,19 +51,24 @@ class Project:
         return self._tagged_src_files
 
     @property
-    def repo(self):
+    def repo(self) -> Repo:
+        """Returns the GitPython Repo object describing the git repo found in the current directory. If no repo is found, an error is raised."""
         return self._repo
     @property
-    def path(self):
+    def path(self) -> str:
+        """String representing the path that the Project has been told to look in."""
         return self._path
     @property
-    def tree(self):
+    def tree(self) -> Tree:
+        """GitPython Tree object. Should always point to the project's root git tree in the latest commit."""
         return self.repo.head.commit.tree
     @property
-    def commit(self):
-        return self.repo.head.commit
+    def commit_id(self) -> str:
+        """Head commit hexsha."""
+        return self.repo.head.commit.hexsha
     @property
-    def name(self):
+    def name(self) -> str:
+        """Name of project's root directory is assumed to be the project's name."""
         normed_path = os.path.normpath(self._path)
         tail = normed_path.rpartition('/')[-1]
         return tail
@@ -88,9 +93,8 @@ class Project:
             lang_type = SrcLang.get_lang(file_name)
             if lang_type != None:
                 path_to_file = f"{self.path}{entry.path}"
-                commit_hash = self.commit.hexsha
                 blob_hash = entry.hexsha
-                code_file = CodeFile(file_name, path_to_file, lang_type, commit_hash, blob_hash)
+                code_file = CodeFile(file_name, path_to_file, lang_type, self.commit_id, blob_hash)
                 blobs.append(code_file)
         return blobs
 

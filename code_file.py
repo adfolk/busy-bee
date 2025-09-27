@@ -8,7 +8,7 @@ class CodeFile:
         self._file_name = file_name
         self._file_path = file_path
         self._lang = lang_type
-        self._commit = commit_hash
+        self._commit_id = commit_hash
         self._blob_id = blob_hash
         self._tags: list[CodeTag] = self._extract_tagged_comments()
 
@@ -19,8 +19,8 @@ class CodeFile:
     def lang(self):
         return self._lang
     @property
-    def commit(self):
-        return self._commit
+    def commit_id(self):
+        return self._commit_id
     @property
     def blob(self):
         return self._blob_id
@@ -42,7 +42,7 @@ class CodeFile:
                     tag_type = CodeTagEnum.which_tag(first_token)
                     tag_text = separated_text[1]
                     if tag_type != None:
-                        tag_list.append(CodeTag(tag_type, num_ln, tag_text, self.file_name, self.commit, self.blob))
+                        tag_list.append(CodeTag(tag_type, num_ln, tag_text, self.file_name, self.commit_id, self.blob))
             return tag_list
 
     @staticmethod
