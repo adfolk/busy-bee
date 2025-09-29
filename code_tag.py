@@ -26,5 +26,5 @@ class CodeTag:
     blob_parent: str
 
     @property
-    def tag_name(self):
+    def tag_name(self) -> str:
         return self._tag_enum.name
