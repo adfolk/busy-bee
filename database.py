@@ -12,7 +12,7 @@ def create_app_db() -> db.Database:
 
     app_path = f"{app_dir}/bee_db"
 
-    return db.SqliteDatabase(app_path)
+    return db.SqliteDatabase(app_path, pragmas={'foreign_keys': 1})
 
 def _get_local_data_dir() -> str:
     data_path = os.path.expanduser("~/")

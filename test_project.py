@@ -18,6 +18,7 @@ class TestProject(unittest.TestCase):
 
     def test_commit_id_length(self):
         self.assertEqual(len(proj.commit_id), 40)
+        print(proj.commit_id)
 
     def test_proj_has_files(self):
         tag_files = proj.tagged_src_files
