@@ -34,6 +34,7 @@ def create_db_with_project_files(path_name: str):
     proj = Project(path_name)
     src_files = proj.src_files
     tagged_files = proj.tagged_src_files
+<<<<<<< HEAD
     print(proj.commit_id)
     rpo = ProjectRepo(name=proj.name, commit_id=proj.commit_id, path=proj.path)
     print(rpo.commit_id)
@@ -42,12 +43,26 @@ def create_db_with_project_files(path_name: str):
     for file in src_files:
         SourceCodeFile.create(
             commit_id = file.commit_id,
+=======
+    ProjectRepo.create(
+        commit_id = proj.commit_id,
+        name = proj.name,
+        path = proj.path
+    )
+    for file in src_files:
+        SourceCodeFile.create(
+            commit_id = proj.commit_id,
+>>>>>>> 2ebfc25 (db test runner)
             blob_id = file.blob,
             name = file.file_name
         )
     for file in tagged_files:
         for tag in file.tags:
             CodeTag.create(
+<<<<<<< HEAD
+=======
+                commit_id = proj.commit_id,
+>>>>>>> 2ebfc25 (db test runner)
                 parent_blob_id = tag.blob_parent,
                 tag_name = tag.tag_name,
                 message = tag.message,
