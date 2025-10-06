@@ -14,7 +14,7 @@ def create_app_db() -> db.Database:
 
     app_path = f"{app_dir}/bee_db"
 
-    return db.SqliteDatabase(app_path, pragmas={'foreign_keys': 1})
+    return db.SqliteDatabase(app_path)
 
 def _get_local_data_dir() -> str:
     data_path = os.path.expanduser("~/")
@@ -27,6 +27,22 @@ def _get_local_data_dir() -> str:
             raise NotImplementedError("Only mac and linux are currently supported")
 
     return data_path
+
+def with_app_db(dbs: tuple):
+    """Decorator for managing the application's database connection."""
+
+    def decorator(func):
+        @wraps(func)
+        def app_db_closure(*args, **kwargs):
+            app_db = create_app_db()
+            with app_db.bind_ctx(dbs):
+                app_db.create_tables(dbs)
+                try:
+                    func(*args, **kwargs)
+                finally:
+                    app_db.close()
+        return app_db_closure
+    return decorator
 
 def with_test_db(dbs: tuple):
     """
