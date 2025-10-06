@@ -1,8 +1,11 @@
 import os
+import peewee
 import typer
 from typing_extensions import Annotated, Optional
 from rich.table import Table
 from rich.console import Console
+from orm import app_tables, CodeTag
+from project import Project
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -14,10 +17,11 @@ def Get_Tasks(
         help="Choose which tag types to show: [t]odo, [f]ix, [h]ack, [p]erf, [w]arning")] = None,
     ):
 
-    global_project = os.path.basename(project_path)
-    table = make_display_table(global_project)
-    console = Console()
-    console.print(table)
+    commit = app_tables(project_path)
+    all_tags = CodeTag.select().where(CodeTag.commit_id == commit).get()
+    table = make_display_table()
+    for tag in all_tags:
+        pass
 
 @app.command()
 def Hide_Entries(
@@ -39,27 +43,6 @@ def make_display_table(name: str) -> Table:
     table.add_column("Message", style="slate_blue1")
 
     return table
-
-
-# def filter_arguments(tags: str) -> tuple[str]:
-#     user_list = list(tags)
-#     command_list = []
-#     for item in user_list:
-#         match item:
-#             case "t":
-#                 command_list.append(TODO)
-#             case "f":
-#                 command_list.append(FIX)
-#             case "p":
-#                 command_list.append(PERF)
-#             case "w":
-#                 command_list.append(WARNING)
-#             case "h":
-#                 command_list.append(HACK)
-#             case _:
-#                 raise ValueError(f"{item} is not an accepted argument")
-#
-#     return tuple(command_list)
 
 if __name__ == "__main__":
     app()

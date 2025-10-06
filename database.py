@@ -30,7 +30,6 @@ def _get_local_data_dir() -> str:
 
 def with_app_db(dbs: tuple):
     """Decorator for managing the application's database connection."""
-
     def decorator(func):
         @wraps(func)
         def app_db_closure(*args, **kwargs):
@@ -47,14 +46,12 @@ def with_app_db(dbs: tuple):
 def with_test_db(dbs: tuple):
     """
     Create a test db in memory and bind it to the ORM models.
-
     This creates the tables, runs the test function, and then drops the tables.
 
     :param dbs: A tuple of the models to bind to the test database.
     
     Adapted from this blog post: https://medium.com/@aaronfulton/mocking-with-peewee-pytest-a84442bfbb77
     """
-
     def decorator(func):
         @wraps(func)
         def test_db_closure(*args, **kwargs):

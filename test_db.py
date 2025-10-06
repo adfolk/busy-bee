@@ -3,7 +3,8 @@ from orm import *
 
 @with_test_db((ProjectRepo, SourceCodeFile, CodeTag))
 def query_all(path: str):
-    create_proj_tables(path)
+    cmt = create_proj_tables(path)
+    print(cmt)
     for tag in CodeTag.select():
         print(f"type: {tag.tag_name}\nmessage: {tag.message}")
 
