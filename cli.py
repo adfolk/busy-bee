@@ -1,9 +1,10 @@
+import git
 import os
 import typer
-from typing_extensions import Annotated, Optional
+from database import app_tables, CodeTag, ProjectRepo
 from rich.table import Table
 from rich.console import Console
-from orm import ProjectRepo, CodeTag, app_tables, database
+from typing_extensions import Annotated, Optional
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -14,12 +15,13 @@ def Get_Tasks(
         "--select-tags", "-s",
         help="Choose which tag types to show: [t]odo, [f]ix, [h]ack, [p]erf, [w]arning")] = None,
     ):
+    app_tables(project_path)
 
-    commit = app_tables(project_path)
-    all_tags = CodeTag.select().where(CodeTag.commit_id == commit).get()
-    table = make_display_table(ProjectRepo.select().where(ProjectRepo.commit_id == commit).get().name)
-    for i in range(len(all_tags)):
-        table.add_row(str(i), str(all_tags[i].line_num), all_tags[i].tag_name, all_tags[i].message)
+    # TODO: avoid creating duplicate records upon rerunning command on same directory
+
+    table = make_display_table("everything")
+    for tag in CodeTag.select():
+        table.add_row('0', str(tag.line_num), tag.tag_name, tag.message)
 
     console = Console()
     console.print(table)

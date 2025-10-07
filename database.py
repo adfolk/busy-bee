@@ -97,6 +97,8 @@ def app_tables(path: str) -> None:
 
 def create_proj_tables(path: str) -> None:
     """Gets the tables to the chopper."""
+    # TODO: figure out deduplication
+
     proj = Project(path)
     ProjectRepo.create(name=proj.name, commit_id=proj.commit_id, path=proj.path)
     for file in proj.tagged_src_files:
