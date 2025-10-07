@@ -1,11 +1,9 @@
 import os
-import peewee
 import typer
 from typing_extensions import Annotated, Optional
 from rich.table import Table
 from rich.console import Console
-from orm import app_tables, CodeTag
-from project import Project
+from orm import ProjectRepo, CodeTag, app_tables, database
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -19,9 +17,12 @@ def Get_Tasks(
 
     commit = app_tables(project_path)
     all_tags = CodeTag.select().where(CodeTag.commit_id == commit).get()
-    table = make_display_table()
-    for tag in all_tags:
-        pass
+    table = make_display_table(ProjectRepo.select().where(ProjectRepo.commit_id == commit).get().name)
+    for i in range(len(all_tags)):
+        table.add_row(str(i), str(all_tags[i].line_num), all_tags[i].tag_name, all_tags[i].message)
+
+    console = Console()
+    console.print(table)
 
 @app.command()
 def Hide_Entries(
@@ -37,7 +38,7 @@ def Hide_Entries(
 def make_display_table(name: str) -> Table:
     table = Table(title=name, show_lines=True)
     table.add_column("#", style="white")
-    table.add_column("Filename", style="green1")
+    # table.add_column("Filename", style="green1")
     table.add_column("Line Num", style="cyan1")
     table.add_column("Tag Type", style="magenta1")
     table.add_column("Message", style="slate_blue1")

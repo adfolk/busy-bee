@@ -92,7 +92,7 @@ class Project:
             file_name = entry.name
             lang_type = SrcLang.get_lang(file_name)
             if lang_type != None:
-                path_to_file = f"{self.path}{entry.path}"
+                path_to_file = f"{self.path}/{entry.path}"
                 blob_hash = entry.hexsha
                 code_file = CodeFile(file_name, path_to_file, lang_type, self.commit_id, blob_hash)
                 blobs.append(code_file)
