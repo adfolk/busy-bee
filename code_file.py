@@ -40,8 +40,8 @@ class CodeFile:
                 if len(separated_text) > 0:
                     first_token = separated_text[0].strip(self.lang.comment_symbol).strip()
                     tag_type = CodeTagEnum.which_tag(first_token)
-                    tag_text = separated_text[1]
                     if tag_type != None:
+                        tag_text = separated_text[1]
                         tag_list.append(CodeTag(tag_type, num_ln, tag_text, self.file_name, self.commit_id, self.blob))
             return tag_list
 
