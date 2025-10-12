@@ -1,13 +1,12 @@
 import os
 import os.path
 import platform
-import peewee as db
 import tempfile
 from functools import wraps
 from project import Project
-from peewee import IntegerField, Model, TextField
+from peewee import Database, Source, SqliteDatabase, IntegerField, Model, TextField
 
-def create_app_db() -> db.Database:
+def create_app_db() -> Database:
     dir_path = _get_local_data_dir()
     app_dir = f"{dir_path}/busy-bee"
 
@@ -16,7 +15,7 @@ def create_app_db() -> db.Database:
 
     app_path = f"{app_dir}/bee_db"
 
-    return db.SqliteDatabase(app_path)
+    return SqliteDatabase(app_path)
 
 def _get_local_data_dir() -> str:
     data_path = os.path.expanduser("~/")
@@ -30,11 +29,11 @@ def _get_local_data_dir() -> str:
 
     return data_path
 
-database = create_app_db()
+db = create_app_db()
 
 class BaseModel(Model):
     class Meta:
-        database = database
+        database = db
 
 class ProjectRepo(BaseModel):
     commit_id = TextField()
@@ -54,8 +53,6 @@ class CodeTag(BaseModel):
     line_num = IntegerField()
 
 
-
-
 def with_app_db(dbs: tuple):
     """Decorator for managing the application's database connection."""
     def decorator(func):
@@ -65,6 +62,7 @@ def with_app_db(dbs: tuple):
             with app_db.bind_ctx(dbs):
                 app_db.create_tables(dbs)
                 func(*args, **kwargs)
+                app_db.close()
         return app_db_closure
     return decorator
 
@@ -80,7 +78,7 @@ def with_test_db(dbs: tuple):
     def decorator(func):
         @wraps(func)
         def test_db_closure(*args, **kwargs):
-            test_db = db.SqliteDatabase(os.path.join(tempfile.gettempdir(), 'test_bee.db'))
+            test_db = SqliteDatabase(os.path.join(tempfile.gettempdir(), 'test_bee.db'))
             with test_db.bind_ctx(dbs):
                 test_db.create_tables(dbs)
                 try:
@@ -91,11 +89,12 @@ def with_test_db(dbs: tuple):
         return test_db_closure
     return decorator
 
-@with_app_db((ProjectRepo, SourceCodeFile, CodeTag))
-def app_tables(path: str) -> None:
-    create_proj_tables(path)
+@db.connection_context()
+def app_tables(path: str) -> str:
+    db.create_tables([ProjectRepo, SourceCodeFile, CodeTag])
+    return create_proj_tables(path)
 
-def create_proj_tables(path: str) -> None:
+def create_proj_tables(path: str) -> str:
     """Gets the tables to the chopper."""
     # TODO: figure out deduplication
 
@@ -105,4 +104,4 @@ def create_proj_tables(path: str) -> None:
         SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
         for code_tag in file.tags:
             CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
-    # return proj.commit_id
+    return proj.commit_id

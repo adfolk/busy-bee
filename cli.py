@@ -1,7 +1,6 @@
-import git
 import os
 import typer
-from database import app_tables, CodeTag, ProjectRepo
+from database import app_tables, CodeTag
 from rich.table import Table
 from rich.console import Console
 from typing_extensions import Annotated, Optional
@@ -15,7 +14,7 @@ def Get_Tasks(
         "--select-tags", "-s",
         help="Choose which tag types to show: [t]odo, [f]ix, [h]ack, [p]erf, [w]arning")] = None,
     ):
-    app_tables(project_path)
+    proj_commit_id = app_tables(project_path)
 
     # TODO: avoid creating duplicate records upon rerunning command on same directory
 
@@ -36,6 +35,9 @@ def Hide_Entries(
     Example: 1 3 8 10
     """
     raise NotImplementedError("not done yet")
+
+
+# Helper functions
 
 def make_display_table(name: str) -> Table:
     table = Table(title=name, show_lines=True)
