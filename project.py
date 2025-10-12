@@ -18,9 +18,6 @@ class Project:
         The Project.files property will return a list of tagged files if they exist, or None if no tags are found.
         """
 
-        # TODO: figure out how to detect when working tree not clean w/nothing to commit
-        # If user attempts cmd with staged or untracked changes, show warning.
-
         # TEST: if the tree property tracks state between commits
 
         self._repo: Repo = Repo(project_path)
