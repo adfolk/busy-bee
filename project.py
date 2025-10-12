@@ -26,7 +26,7 @@ class Project:
         self._repo: Repo = Repo(project_path)
         self._path: str = project_path
         assert not self._repo.bare, f"No git repository initialized at path {project_path}"
-        assert not self._repo.is_dirty, f"Make sure your git repository is clean"
+        assert not self._repo.is_dirty(), f"Make sure your git repository is clean"
         self._src_files: list[CodeFile] = []
         self._tagged_src_files: list[CodeFile] = []
 
