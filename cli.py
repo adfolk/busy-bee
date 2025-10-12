@@ -19,7 +19,7 @@ def Get_Tasks(
     # TODO: avoid creating duplicate records upon rerunning command on same directory
 
     table = make_display_table("everything")
-    for tag in CodeTag.select():
+    for tag in CodeTag.select().where(CodeTag.parent_blob_id == proj_commit_id):
         table.add_row('0', str(tag.line_num), tag.tag_name, tag.message)
 
     console = Console()
