@@ -14,8 +14,6 @@ def Get_Tasks(
     ):
     created_project = app_tables(project_path)
 
-    # TODO: avoid creating duplicate records upon rerunning command on same directory
-
     table = make_display_table(created_project.name)
 
     row_num = 0
