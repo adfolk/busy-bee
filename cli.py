@@ -1,6 +1,6 @@
 import os
 import typer
-from database import app_tables, CodeTag
+from database import SourceCodeFile, app_tables, CodeTag
 from rich.table import Table
 from rich.console import Console
 from typing_extensions import Annotated
@@ -10,7 +10,7 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Get_Tasks(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    all_tag_types: Annotated[bool, typer.Option("--all", "-a", help="Show all tag types")] = False,
+    all_tag_types: Annotated[bool, typer.Option("--all", "-a", help="Show all tag types")] = False
     ):
     created_project = app_tables(project_path)
 
@@ -20,28 +20,29 @@ def Get_Tasks(
 
     table = make_display_table(created_project.name)
 
-    match all_tag_types:
-        case False:
-            for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
-                table.add_row('0', tag.parent_blob_id, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
-        case True:
-            for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
-                table.add_row('0', tag.parent_blob_id, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+    if all_tag_types == False:
+        for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
+            file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
+            table.add_row('0', file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+    else:
+        for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
+            file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
+            table.add_row('0', file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
 
     console = Console()
     console.print(table)
 
-@app.command()
-def Hide_Entries(
-    tag_ids: Annotated[list[str], typer.Argument()]
-    ):
-    """
-    Pass in a string of numbers delimited by whitespace.
-
-    Example: 1 3 8 10
-    """
-    raise NotImplementedError("not done yet")
-
+# @app.command()
+# def Hide_Entries(
+#     tag_ids: Annotated[list[str], typer.Argument()]
+#     ):
+#     """
+#     Pass in a string of numbers delimited by whitespace.
+#
+#     Example: 1 3 8 10
+#     """
+#     raise NotImplementedError("not done yet")
+#
 
 # Helper functions
 
