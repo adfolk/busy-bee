@@ -3,7 +3,7 @@ import typer
 from database import app_tables, CodeTag
 from rich.table import Table
 from rich.console import Console
-from typing_extensions import Annotated, Optional
+from typing_extensions import Annotated
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -16,15 +16,17 @@ def Get_Tasks(
 
     # TODO: avoid creating duplicate records upon rerunning command on same directory
 
+    # HACK: this entire project
+
     table = make_display_table(created_project.name)
 
     match all_tag_types:
         case False:
             for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
-                table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+                table.add_row('0', tag.parent_blob_id, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
         case True:
             for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
-                table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+                table.add_row('0', tag.parent_blob_id, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
 
     console = Console()
     console.print(table)
@@ -46,7 +48,7 @@ def Hide_Entries(
 def make_display_table(name: str) -> Table:
     table = Table(title=name, show_lines=True)
     table.add_column("#", style="white")
-    # table.add_column("Filename", style="green1")
+    table.add_column("Filename", style="green1")
     table.add_column("Line Num", style="cyan1")
     table.add_column("Tag Type", style="magenta1")
     table.add_column("Message", style="slate_blue1")
