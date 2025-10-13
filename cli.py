@@ -16,8 +16,6 @@ def Get_Tasks(
 
     # TODO: avoid creating duplicate records upon rerunning command on same directory
 
-    # HACK: this entire project
-
     table = make_display_table(created_project.name)
 
     if all_tag_types == False:
@@ -31,18 +29,6 @@ def Get_Tasks(
 
     console = Console()
     console.print(table)
-
-# @app.command()
-# def Hide_Entries(
-#     tag_ids: Annotated[list[str], typer.Argument()]
-#     ):
-#     """
-#     Pass in a string of numbers delimited by whitespace.
-#
-#     Example: 1 3 8 10
-#     """
-#     raise NotImplementedError("not done yet")
-#
 
 # Helper functions
 
