@@ -10,7 +10,7 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Get_Tasks(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    all_tag_types: Annotated[Optional[str], typer.Option("--all", "-a", help="Show all tag types")] = None,
+    all_tag_types: Annotated[bool, typer.Option("--all", "-a", help="Show all tag types")] = False,
     ):
     created_project = app_tables(project_path)
 
@@ -19,10 +19,10 @@ def Get_Tasks(
     table = make_display_table(created_project.name)
 
     match all_tag_types:
-        case None:
+        case False:
             for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
                 table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
-        case _:
+        case True:
             for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
                 table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
 
