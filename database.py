@@ -36,19 +36,19 @@ class BaseModel(Model):
         database = db
 
 class ProjectRepo(BaseModel):
-    commit_id = TextField()
+    commit_id = TextField(primary_key=True)
     name = TextField()
     path = TextField()
 
 class SourceCodeFile(BaseModel):
     commit_id = TextField()
-    blob_id = TextField()
+    blob_id = TextField(primary_key=True)
     name = TextField()
 
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
-    msg_uid = TextField()
+    msg_uid = TextField(primary_key=True)
     tag_name = TextField()
     message = TextField()
     line_num = IntegerField()

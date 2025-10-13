@@ -17,6 +17,9 @@ def Get_Tasks(
     proj_commit_id = app_tables(project_path)
 
     # TODO: avoid creating duplicate records upon rerunning command on same directory
+    # I think this one is almost done
+
+    # TODO: figure out how to select tag types
 
     table = make_display_table("everything")
 
