@@ -1,3 +1,4 @@
+import hashlib
 from enum import Enum
 from dataclasses import dataclass
 
@@ -28,3 +29,9 @@ class CodeTag:
     @property
     def tag_name(self) -> str:
         return self._tag_enum.name
+
+    @property
+    def digest(self):
+        elements_str = f"{self._tag_enum.name}{self.message}{str(self.line_number)}"
+        elements_byte = elements_str.encode()
+        return hashlib.sha1(elements_byte).hexdigest()

@@ -19,8 +19,9 @@ def Get_Tasks(
     # TODO: avoid creating duplicate records upon rerunning command on same directory
 
     table = make_display_table("everything")
+
     for tag in CodeTag.select().where(CodeTag.commit_id == proj_commit_id):
-        table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id)
+        table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
 
     console = Console()
     console.print(table)
@@ -47,6 +48,7 @@ def make_display_table(name: str) -> Table:
     table.add_column("Tag Type", style="magenta1")
     table.add_column("Message", style="slate_blue1")
     table.add_column("Commit ID", style="cyan1")
+    table.add_column("Tag UID", style="cyan1")
 
     return table
 

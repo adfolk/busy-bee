@@ -4,7 +4,7 @@ import platform
 import tempfile
 from functools import wraps
 from project import Project
-from peewee import Database, Source, SqliteDatabase, IntegerField, Model, TextField
+from peewee import Database, SqliteDatabase, IntegerField, Model, TextField
 
 def create_app_db() -> Database:
     dir_path = _get_local_data_dir()
@@ -48,6 +48,7 @@ class SourceCodeFile(BaseModel):
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
+    msg_uid = TextField()
     tag_name = TextField()
     message = TextField()
     line_num = IntegerField()
@@ -103,5 +104,5 @@ def create_proj_tables(path: str) -> str:
     for file in proj.tagged_src_files:
         SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
         for code_tag in file.tags:
-            CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
+            CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
     return proj.commit_id
