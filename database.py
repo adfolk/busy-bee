@@ -4,7 +4,7 @@ import platform
 import tempfile
 from functools import wraps
 from project import Project
-from peewee import Database, SqliteDatabase, IntegerField, Model, TextField
+from peewee import Database, IntegrityError, SqliteDatabase, IntegerField, Model, TextField
 
 def create_app_db() -> Database:
     dir_path = _get_local_data_dir()
@@ -36,13 +36,13 @@ class BaseModel(Model):
         database = db
 
 class ProjectRepo(BaseModel):
-    commit_id = TextField()
+    commit_id = TextField(primary_key=True)
     name = TextField()
     path = TextField()
 
 class SourceCodeFile(BaseModel):
     commit_id = TextField()
-    blob_id = TextField()
+    blob_id = TextField(primary_key=True)
     name = TextField()
 
 class CodeTag(BaseModel):
@@ -98,9 +98,21 @@ def app_tables(path: str) -> Project:
 def create_proj_tables(path: str) -> Project:
     """Gets the tables to the chopper."""
     proj = Project(path)
-    ProjectRepo.create(name=proj.name, commit_id=proj.commit_id, path=proj.path)
-    for file in proj.tagged_src_files:
-        SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
-        for code_tag in file.tags:
-            CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
+    if proj.repo.is_dirty():
+        print("Running from dirty repo will not capture tags in untracked or uncommitted files")
+    try:
+        ProjectRepo.create(name=proj.name, commit_id=proj.commit_id, path=proj.path)
+        for file in proj.tagged_src_files:
+            try:
+                SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
+                for code_tag in file.tags:
+                    try:
+                        CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
+                    except IntegrityError:
+                        pass
+            except IntegrityError:
+                pass
+    except IntegrityError:
+        print(f"Project {proj.name} with commit ID {proj.commit_id} already exists")
     return proj
+
