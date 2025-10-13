@@ -109,9 +109,9 @@ def create_proj_tables(path: str) -> Project:
                     try:
                         CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
                     except IntegrityError:
-                        pass
+                        continue
             except IntegrityError:
-                pass
+                continue
     except IntegrityError:
         print(f"Project {proj.name} with commit ID {proj.commit_id} already exists")
     return proj
