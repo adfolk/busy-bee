@@ -10,21 +10,21 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def Get_Tasks(
     project_path: Annotated[str, typer.Argument()] = os.getcwd(),
-    select_tag_types: Annotated[Optional[str], typer.Option(
-        "--select-tags", "-s",
-        help="Choose which tag types to show: [t]odo, [f]ix, [h]ack, [p]erf, [w]arning")] = None,
+    all_tag_types: Annotated[Optional[str], typer.Option("--all", "-a", help="Show all tag types")] = None,
     ):
-    proj_commit_id = app_tables(project_path)
+    created_project = app_tables(project_path)
 
     # TODO: avoid creating duplicate records upon rerunning command on same directory
-    # I think this one is almost done
 
-    # TODO: figure out how to select tag types
+    table = make_display_table(created_project.name)
 
-    table = make_display_table("everything")
-
-    for tag in CodeTag.select().where(CodeTag.commit_id == proj_commit_id):
-        table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+    match all_tag_types:
+        case None:
+            for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
+                table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+        case _:
+            for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
+                table.add_row('0', str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
 
     console = Console()
     console.print(table)

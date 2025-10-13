@@ -36,19 +36,19 @@ class BaseModel(Model):
         database = db
 
 class ProjectRepo(BaseModel):
-    commit_id = TextField(primary_key=True)
+    commit_id = TextField()
     name = TextField()
     path = TextField()
 
 class SourceCodeFile(BaseModel):
     commit_id = TextField()
-    blob_id = TextField(primary_key=True)
+    blob_id = TextField()
     name = TextField()
 
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
-    msg_uid = TextField(primary_key=True)
+    msg_uid = TextField()
     tag_name = TextField()
     message = TextField()
     line_num = IntegerField()
@@ -91,18 +91,16 @@ def with_test_db(dbs: tuple):
     return decorator
 
 @db.connection_context()
-def app_tables(path: str) -> str:
+def app_tables(path: str) -> Project:
     db.create_tables([ProjectRepo, SourceCodeFile, CodeTag])
     return create_proj_tables(path)
 
-def create_proj_tables(path: str) -> str:
+def create_proj_tables(path: str) -> Project:
     """Gets the tables to the chopper."""
-    # TODO: figure out deduplication
-
     proj = Project(path)
     ProjectRepo.create(name=proj.name, commit_id=proj.commit_id, path=proj.path)
     for file in proj.tagged_src_files:
         SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
         for code_tag in file.tags:
             CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
-    return proj.commit_id
+    return proj
