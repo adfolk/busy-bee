@@ -18,14 +18,18 @@ def Get_Tasks(
 
     table = make_display_table(created_project.name)
 
+    row_num = 0
+
     if all_tag_types == False:
         for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id, CodeTag.tag_name == "TODO"):
             file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
-            table.add_row('0', file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+            table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+            row_num += 1
     else:
         for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
             file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
-            table.add_row('0', file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+            table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+            row_num += 1
 
     console = Console()
     console.print(table)

@@ -48,7 +48,7 @@ class SourceCodeFile(BaseModel):
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
-    msg_uid = TextField()
+    msg_uid = TextField(primary_key=True)
     tag_name = TextField()
     message = TextField()
     line_num = IntegerField()
