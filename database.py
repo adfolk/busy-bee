@@ -114,7 +114,6 @@ def create_proj_tables(path: str) -> Project:
                 tag_prt_str = f"**** tag id: {uid}    ****"
                 com_prt_str = f"**** commit id: {commitId} ****"
                 star_hdr = "*" * len(com_prt_str)
-                print("***      UPDATING RECORD     ***")
                 print(star_hdr)
                 print(tag_prt_str)
                 print(com_prt_str)
@@ -127,6 +126,7 @@ def create_proj_tables(path: str) -> Project:
 
                 ###
                 # BEGIN PRINT DEBUGGING SECTION
+                print("***      UPDATED RECORD     ***")
                 updated_search = CodeTag.select().where(CodeTag.commit_id == proj.commit_id, CodeTag.msg_uid == code_tag.digest).get()
                 ud_uid = updated_search.msg_uid
                 ud_commitId = updated_search.commit_id
