@@ -29,8 +29,8 @@ def Get_Tasks(
     else:
         print(f"Running with all tags showing")
         print(f"Project ID: {created_project.commit_id}")
-        for tag in CodeTag.select():
-            print(tag.message, tag.commit_id)
+        # for tag in CodeTag.select():
+        #     print(tag.message, tag.commit_id)
         # print(CodeTag.select().where(CodeTag.commit_id == created_project.commit_id))
         for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
             print(f"putting {tag} into Rich table")

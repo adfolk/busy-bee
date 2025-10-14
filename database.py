@@ -106,19 +106,18 @@ def create_proj_tables(path: str) -> Project:
         for code_tag in file.tags:
             try:
                 search = CodeTag.select().where(CodeTag.msg_uid == code_tag.digest).get()
-                # uid = search.msg_uid
-                # commitId = search.commit_id
-                # print(f"Tag with uid {uid} has commit id {commitId}")
+                uid = search.msg_uid
+                commitId = search.commit_id
+                print(f"Tag with uid {uid} has commit id {commitId}")
                 search.update(commit_id=file.commit_id, parent_blob_id=file.blob)
-                # updated_search = CodeTag.select().where(CodeTag.commit_id == proj.commit_id, CodeTag.msg_uid == code_tag.digest).get()
-                # ud_uid = updated_search.msg_uid
-                # ud_commitId = updated_search.commit_id
-                # print(f"{ud_uid} now has {ud_commitId}")
+                updated_search = CodeTag.select().where(CodeTag.commit_id == proj.commit_id, CodeTag.msg_uid == code_tag.digest).get()
+                ud_uid = updated_search.msg_uid
+                ud_commitId = updated_search.commit_id
+                print(f"{ud_uid} now has {ud_commitId}")
             except DoesNotExist:
                 print("*****************************************")
                 print("**** creating new entry for code_tag ****")
-                print("*****************************************")
-                print("\n")
+                print("*****************************************\n")
                 CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
     return proj
 
