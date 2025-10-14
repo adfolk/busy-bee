@@ -27,7 +27,9 @@ def Get_Tasks(
             table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
             row_num += 1
     else:
+        print(f"Running with all tags showing")
         for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
+            print(f"putting {tag} into Rich table")
             file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
             table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
             row_num += 1
