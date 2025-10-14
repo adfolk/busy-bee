@@ -42,13 +42,13 @@ class ProjectRepo(BaseModel):
 
 class SourceCodeFile(BaseModel):
     commit_id = TextField()
-    blob_id = TextField(primary_key=True)
+    blob_id = TextField()
     name = TextField()
 
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
-    msg_uid = TextField(primary_key=True)
+    msg_uid = TextField()
     tag_name = TextField()
     message = TextField()
     line_num = IntegerField()
