@@ -17,8 +17,6 @@ class Project:
 
         The Project.files property will return a list of tagged files if they exist, or None if no tags are found.
         """
-
-
         self._repo: Repo = Repo(project_path)
         self._path: str = project_path
         assert not self._repo.bare, f"No git repository initialized at path {project_path}"
