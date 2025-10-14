@@ -1,6 +1,6 @@
 import os
 import typer
-from database import SourceCodeFile, app_tables, CodeTag
+from database import db, SourceCodeFile, app_tables, CodeTag
 from rich.table import Table
 from rich.console import Console
 from typing_extensions import Annotated
@@ -13,6 +13,9 @@ def Get_Tasks(
     all_tag_types: Annotated[bool, typer.Option("--all", "-a", help="Show all tag types")] = False
     ):
     created_project = app_tables(project_path)
+    # BUG: running command after committing causes Rich tables to print blank
+    # maybe this has something to do with the way that app_tables handles primary key exceptions?
+    # blowing away the bee.db file gets it to work again
 
     table = make_display_table(created_project.name)
 
@@ -28,6 +31,19 @@ def Get_Tasks(
             file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
             table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
             row_num += 1
+
+    console = Console()
+    console.print(table)
+
+@app.command()
+@db.connection_context()
+def Print_All():
+    table = make_display_table("All Tags in DB")
+    row_num = 0
+    for tag in CodeTag.select():
+        file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
+        table.add_row(str(row_num), file_name, str(tag.line_num), tag.tag_name, tag.message, tag.commit_id, tag.msg_uid)
+        row_num += 1
 
     console = Console()
     console.print(table)
