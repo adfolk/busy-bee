@@ -91,12 +91,21 @@ def with_test_db(dbs: tuple):
     return decorator
 
 @db.connection_context()
-def app_tables(path: str) -> Project:
+def fill_app_tables(path: str) -> Project:
     db.create_tables([ProjectRepo, SourceCodeFile, CodeTag])
     return create_proj_tables(path)
 
 def create_proj_tables(path: str) -> Project:
-    """Gets the tables to the chopper."""
+    """
+    Gets all code tags in the project's head commit tree and pushes them to the ORM models.
+
+    If a code tag is unchanged between commits, the refs are simply updated to the new values.
+
+    Code tags are considered "unchanged" if the line number, message, AND the tag type all stay the same.
+    This is determined by the `CodeTag.digest` property, which is the SHA1 hash of the line number, message, and tag type concatenated together.
+
+    This function is not usable as-is and must be decorated with something else to manage the db connection. This is so that the app db can be separated from the test db.
+    """
     proj = Project(path)
     if proj.repo.is_dirty():
         print("Running from dirty repo will not capture tags in untracked or uncommitted files")
@@ -107,41 +116,14 @@ def create_proj_tables(path: str) -> Project:
             try:
                 search = CodeTag.select().where(CodeTag.msg_uid == code_tag.digest).get()
                 if search.commit_id != file.commit_id:
-                    # Update record
-
-                    ###
-                    # BEGIN PRINT DEBUGGING SECTION
-                    uid = search.msg_uid
-                    commitId = search.commit_id
-                    tag_prt_str = f"**** tag id: {uid}    ****"
-                    com_prt_str = f"**** commit id: {commitId} ****"
-                    star_hdr = "*" * len(com_prt_str)
-                    print(star_hdr)
-                    print(tag_prt_str)
-                    print(com_prt_str)
-                    print(star_hdr, "\n")
-                    print(f"*** updating to commit ID {file.commit_id} ***")
-                    # END PRINT DEBUGGING SECTION
-                    ###
-
-                    search.save(commit_id=file.commit_id, parent_blob_id=file.blob)
-
-                    ###
-                    # BEGIN PRINT DEBUGGING SECTION
-                    print("***      UPDATED RECORD     ***")
-                    updated_search = CodeTag.select().where(CodeTag.commit_id == proj.commit_id, CodeTag.msg_uid == code_tag.digest).get()
-                    ud_uid = updated_search.msg_uid
-                    ud_commitId = updated_search.commit_id
-                    print(f"{ud_uid} now has {ud_commitId}")
-                    # END PRINT DEBUGGING SECTION
-                    ###
+                    # Update the tag record
+                    search.commit_id = file.commit_id
+                    search.parent_blob_id = file.blob
+                    search.save()
                 else:
                     continue
 
             except DoesNotExist:
-                print("*****************************************")
-                print("**** creating new entry for code_tag ****")
-                print("*****************************************\n")
                 CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
     return proj
 
