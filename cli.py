@@ -28,6 +28,10 @@ def Get_Tasks(
             row_num += 1
     else:
         print(f"Running with all tags showing")
+        print(f"Project ID: {created_project.commit_id}")
+        for tag in CodeTag.select():
+            print(tag.message, tag.commit_id)
+        # print(CodeTag.select().where(CodeTag.commit_id == created_project.commit_id))
         for tag in CodeTag.select().where(CodeTag.commit_id == created_project.commit_id):
             print(f"putting {tag} into Rich table")
             file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
