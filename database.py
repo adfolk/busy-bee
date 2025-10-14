@@ -105,15 +105,35 @@ def create_proj_tables(path: str) -> Project:
         SourceCodeFile.create(commit_id=file.commit_id, blob_id=file.blob, name=file.file_name)
         for code_tag in file.tags:
             try:
-                search = CodeTag.select().where(CodeTag.msg_uid == code_tag.digest).get()
+                search = CodeTag.select().where(CodeTag.msg_uid == code_tag.digest, CodeTag.commit_id != file.commit_id).get()
+
+                ###
+                # BEGIN PRINT DEBUGGING SECTION
                 uid = search.msg_uid
                 commitId = search.commit_id
-                print(f"Tag with uid {uid} has commit id {commitId}")
+                tag_prt_str = f"**** tag id: {uid}    ****"
+                com_prt_str = f"**** commit id: {commitId} ****"
+                star_hdr = "*" * len(com_prt_str)
+                print("***      UPDATING RECORD     ***")
+                print(star_hdr)
+                print(tag_prt_str)
+                print(com_prt_str)
+                print(star_hdr, "\n")
+                print(f"*** updating to commit ID {file.commit_id} ***")
+                # END PRINT DEBUGGING SECTION
+                ###
+
                 search.update(commit_id=file.commit_id, parent_blob_id=file.blob)
+
+                ###
+                # BEGIN PRINT DEBUGGING SECTION
                 updated_search = CodeTag.select().where(CodeTag.commit_id == proj.commit_id, CodeTag.msg_uid == code_tag.digest).get()
                 ud_uid = updated_search.msg_uid
                 ud_commitId = updated_search.commit_id
                 print(f"{ud_uid} now has {ud_commitId}")
+                # END PRINT DEBUGGING SECTION
+                ###
+
             except DoesNotExist:
                 print("*****************************************")
                 print("**** creating new entry for code_tag ****")
