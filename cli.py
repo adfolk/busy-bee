@@ -39,17 +39,18 @@ def Gather(
         tag_flag_args.append(CodeTagEnum.TEST.name)
     if all_tags:
         tag_flag_args = [CodeTagEnum.TODO.name, CodeTagEnum.BUG.name, CodeTagEnum.PERF.name, CodeTagEnum.WARN.name, CodeTagEnum.TEST.name]
-    else:
+    elif not todos and not bugs and not perfs and not warns and not tests and not all_tags:
+        print("executing elif clause")
         tag_flag_args = [CodeTagEnum.TODO.name]
 
     for tag in CodeTag.select().where(
         CodeTag.commit_id == created_project.commit_id,
         CodeTag.tag_name.in_(tag_flag_args)
     ):
-        file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
+        # file_name = SourceCodeFile.get(SourceCodeFile.blob_id == tag.parent_blob_id).name
         table.add_row(
             str(row_num), 
-            file_name, 
+            tag.parent_file_name, 
             str(tag.line_num), 
             tag.tag_name, 
             tag.message, 

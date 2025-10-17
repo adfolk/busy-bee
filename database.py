@@ -48,6 +48,7 @@ class SourceCodeFile(BaseModel):
 class CodeTag(BaseModel):
     commit_id = TextField()
     parent_blob_id = TextField()
+    parent_file_name = TextField()
     msg_uid = TextField()
     tag_name = TextField()
     message = TextField()
@@ -124,6 +125,14 @@ def create_proj_tables(path: str) -> Project:
                     continue
 
             except DoesNotExist:
-                CodeTag.create(commit_id=file.commit_id, parent_blob_id=file.blob, msg_uid=code_tag.digest, message=code_tag.message, line_num=code_tag.line_number, tag_name=code_tag.tag_name)
+                CodeTag.create(
+                    commit_id=file.commit_id,
+                    parent_blob_id=file.blob,
+                    parent_file_name=file.file_name,
+                    msg_uid=code_tag.digest,
+                    message=code_tag.message,
+                    line_num=code_tag.line_number,
+                    tag_name=code_tag.tag_name
+                )
     return proj
 
